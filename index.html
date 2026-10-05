@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penilaian Harian Bahasa Inggris: Passive Voice</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti Library CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f1f5f9;
+        }
+        .header-gradient {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+        }
+        .option-card {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .option-card:hover {
+            border-color: #6366f1;
+            background-color: #f5f3ff;
+        }
+        .option-selected {
+            border-color: #4f46e5 !important;
+            background-color: #eeef2ff !important;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="text-slate-800 min-h-screen flex flex-col justify-between antialiased">
+
+    <header class="header-gradient text-white shadow-md sticky top-0 z-30">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-indigo-500/30 flex items-center justify-center border border-indigo-300/30">
+                    <i class="fa-solid fa-file-pen text-indigo-200 text-lg"></i>
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base md:text-lg leading-tight">Penilaian Harian Bahasa Inggris</h1>
+                    <p class="text-xs text-indigo-200 font-medium">Materi: Passive Voice (Level A1 – Advanced)</p>
+                </div>
+            </div>
+            <!-- Student Mini Info (Hidden on Login) -->
+            <div id="topStudentBadge" class="hidden text-right bg-white/10 px-3 py-1.5 rounded-lg border border-white/10 backdrop-blur-sm">
+                <p id="badgeStudentName" class="text-xs font-bold text-white"></p>
+                <p id="badgeStudentClass" class="text-[11px] text-indigo-200"></p>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto w-full px-4 py-6 flex-grow flex items-center justify-center">
+
+        <!-- ================= 1. LOGIN SCREEN ================= -->
+        <section id="loginScreen" class="w-full max-w-lg mx-auto">
+            <div class="bg-white rounded-3xl shadow-xl border border-slate-200/80 overflow-hidden">
+                <div class="p-8 text-center bg-indigo-900 text-white relative">
+                    <div class="w-16 h-16 bg-indigo-600/50 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-indigo-400/30">
+                        <i class="fa-solid fa-user-graduate text-2xl text-indigo-200"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold">Lembar Kerja Siswa</h2>
+                    <p class="text-indigo-200 text-xs mt-1">Masukkan identitas diri untuk memulai Penilaian Harian</p>
+                </div>
+                
+                <form id="loginForm" onsubmit="handleStartQuiz(event)" class="p-6 md:p-8 space-y-5">
+                    <div>
+                        <label for="inputNama" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">
+                            Nama Lengkap Siswa <span class="text-rose-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                                <i class="fa-solid fa-user"></i>
+                            </span>
+                            <input type="text" id="inputNama" required placeholder="Contoh: Ahmad Fauzi" 
+                                class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-sm font-medium transition-all">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="inputKelas" class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2">
+                            Kelas / Rombel <span class="text-rose-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                                <i class="fa-solid fa-school"></i>
+                            </span>
+                            <input type="text" id="inputKelas" required placeholder="Contoh: XI MIPA 1" 
+                                class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-sm font-medium transition-all">
+                        </div>
+                    </div>
+
+                    <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 text-xs text-indigo-900 space-y-1.5">
+                        <p class="font-bold flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-info text-indigo-600"></i> Ketentuan Penilaian:
+                        </p>
+                        <ul class="list-disc list-inside space-y-1 text-slate-600 pl-1">
+                            <li>Jumlah soal: <strong>25 Butir Soal</strong> (Pilihan Ganda A, B, C, D, E).</li>
+                            <li>Tingkat kesulitan bertahap dari Level A1 hingga TOEFL.</li>
+                            <li>Kunci jawaban bersifat rahasia dan tidak ditampilkan saat dikerjakan.</li>
+                        </ul>
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl text-sm shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2">
+                        <span>Mulai Penilaian</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ================= 2. ASSESSMENT SCREEN ================= -->
+        <section id="assessmentScreen" class="hidden w-full max-w-4xl mx-auto space-y-6">
+            
+            <!-- TOP STATS BAR -->
+            <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex flex-wrap gap-4 items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <span id="levelBadge" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-indigo-100 text-indigo-800">
+                        Level A1
+                    </span>
+                    <span class="text-xs font-medium text-slate-500" id="answeredCounter">
+                        Terjawab: <strong id="answeredCountNum" class="text-indigo-600">0</strong> / 25
+                    </span>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleGridModal()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all">
+                        <i class="fa-solid fa-grip-vertical"></i>
+                        <span>Kisi Soal</span>
+                    </button>
+                    <button onclick="openConfirmModal()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm">
+                        <i class="fa-solid fa-paper-plane"></i>
+                        <span>Kirim Jawaban</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- QUESTION CARD -->
+            <div class="bg-white rounded-3xl shadow-lg border border-slate-200 overflow-hidden">
+                <!-- Progress Line -->
+                <div class="w-full bg-slate-100 h-1.5">
+                    <div id="progressBar" class="bg-indigo-600 h-1.5 transition-all duration-300" style="width: 4%;"></div>
+                </div>
+
+                <div class="p-6 md:p-8 space-y-6">
+                    <!-- Question Header -->
+                    <div class="flex justify-between items-start border-b border-slate-100 pb-4">
+                        <div>
+                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Nomor Soal</span>
+                            <h3 class="text-xl font-extrabold text-slate-800">Soal <span id="qIndexText">1</span> dari 25</h3>
+                        </div>
+                    </div>
+
+                    <!-- Question Body -->
+                    <div class="space-y-2">
+                        <p id="qContext" class="text-xs md:text-sm font-semibold text-indigo-600 italic bg-indigo-50/50 p-3 rounded-xl border border-indigo-100/50 inline-block"></p>
+                        <p id="qText" class="text-base md:text-lg font-bold text-slate-800 leading-relaxed pt-2"></p>
+                    </div>
+
+                    <!-- 5 Options (A, B, C, D, E) -->
+                    <div id="optionsContainer" class="space-y-3 pt-2">
+                        <!-- Dynamic Options rendered via JavaScript -->
+                    </div>
+
+                    <!-- Bottom Nav -->
+                    <div class="flex justify-between items-center pt-6 border-t border-slate-100">
+                        <button id="btnPrev" onclick="navigatePrev()" disabled
+                            class="px-5 py-2.5 rounded-xl font-bold text-xs md:text-sm border border-slate-300 text-slate-600 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center gap-2">
+                            <i class="fa-solid fa-chevron-left"></i>
+                            <span>Sebelumnya</span>
+                        </button>
+
+                        <button id="btnNext" onclick="navigateNext()"
+                            class="px-6 py-2.5 rounded-xl font-bold text-xs md:text-sm bg-indigo-600 hover:bg-indigo-700 text-white shadow-md transition-all flex items-center gap-2">
+                            <span>Selanjutnya</span>
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= 3. SUMMARY / RESULT SCREEN ================= -->
+        <section id="resultScreen" class="hidden w-full max-w-xl mx-auto">
+            <div class="bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden text-center">
+                
+                <!-- Result Header Banner -->
+                <div class="bg-slate-900 text-white p-8 relative overflow-hidden">
+                    <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"></div>
+                    <div class="w-20 h-20 bg-indigo-600/30 border border-indigo-400/30 rounded-3xl flex items-center justify-center mx-auto mb-4 text-indigo-300 text-3xl shadow-inner">
+                        <i class="fa-solid fa-award"></i>
+                    </div>
+                    <h2 class="text-2xl font-black">Hasil Penilaian Harian</h2>
+                    <p class="text-xs text-slate-400 mt-1">Laporan Perolehan Nilai Passive Voice</p>
+                </div>
+
+                <div class="p-6 md:p-8 space-y-6">
+                    
+                    <!-- Identity Box -->
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-left space-y-1">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-slate-400 uppercase">Nama Siswa:</span>
+                            <span id="resName" class="text-sm font-extrabold text-slate-800"></span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold text-slate-400 uppercase">Kelas:</span>
+                            <span id="resClass" class="text-sm font-extrabold text-indigo-600"></span>
+                        </div>
+                    </div>
+
+                    <!-- Score Card -->
+                    <div class="bg-indigo-50/70 p-6 rounded-3xl border border-indigo-100 space-y-2">
+                        <span class="text-xs font-bold uppercase tracking-widest text-indigo-600">Skor Akhir (Skala 100)</span>
+                        <div id="resScore" class="text-6xl font-black text-indigo-900 tracking-tight">0</div>
+                        <p id="resGradeLabel" class="text-xs font-bold text-indigo-700 pt-1"></p>
+                    </div>
+
+                    <!-- Detail Stats Breakdown -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-center">
+                            <span class="text-xs font-bold text-emerald-700 uppercase block mb-1">Jumlah Benar</span>
+                            <span id="resCorrect" class="text-2xl font-black text-emerald-600">0</span>
+                        </div>
+                        <div class="p-4 rounded-2xl bg-rose-50 border border-rose-200 text-center">
+                            <span class="text-xs font-bold text-rose-700 uppercase block mb-1">Jumlah Salah</span>
+                            <span id="resIncorrect" class="text-2xl font-black text-rose-600">0</span>
+                        </div>
+                    </div>
+
+                    <!-- Privacy Notice -->
+                    <div class="bg-slate-100 p-3 rounded-xl text-[11px] text-slate-500 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-lock text-slate-400"></i>
+                        <span>Kunci jawaban bersifat rahasia sesuai ketentuan ujian.</span>
+                    </div>
+
+                    <!-- Action Button -->
+                    <button onclick="resetApp()" class="w-full py-3.5 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl text-sm transition-all flex items-center justify-center gap-2 shadow-lg">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>Selesai / Kembali ke Awal</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- QUESTION PALETTE / GRID MODAL -->
+    <div id="gridModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-100">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-extrabold text-slate-800 text-base">Kisi-Kisi Soal (1 - 25)</h3>
+                <button onclick="toggleGridModal()" class="text-slate-400 hover:text-slate-600 p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <p class="text-xs text-slate-500">Pilih nomor soal untuk berpindah posisi secara cepat:</p>
+
+            <!-- 25 Grid Items -->
+            <div id="gridContainer" class="grid grid-cols-5 gap-2.5 py-2">
+                <!-- Rendered dynamically -->
+            </div>
+
+            <div class="flex items-center justify-between text-[11px] pt-2 border-t border-slate-100 text-slate-500">
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-indigo-600 rounded-md"></span> Terjawab</span>
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-slate-100 border border-slate-300 rounded-md"></span> Belum</span>
+                <span class="flex items-center gap-1.5"><span class="w-3 h-3 border-2 border-indigo-600 rounded-md"></span> Aktif</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUBMIT CONFIRMATION MODAL -->
+    <div id="confirmModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl text-center space-y-4 border border-slate-100">
+            <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mx-auto text-2xl">
+                <i class="fa-solid fa-circle-question"></i>
+            </div>
+            <div>
+                <h3 class="font-extrabold text-slate-800 text-lg">Konfirmasi Pengiriman</h3>
+                <p id="confirmModalText" class="text-xs text-slate-500 mt-1"></p>
+            </div>
+            <div class="flex gap-3 pt-2">
+                <button onclick="closeConfirmModal()" class="w-1/2 py-2.5 border border-slate-300 text-slate-700 font-bold rounded-xl text-xs hover:bg-slate-100 transition-all">
+                    Periksa Lagi
+                </button>
+                <button onclick="submitQuiz()" class="w-1/2 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow-md transition-all">
+                    Ya, Kirim
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-slate-900 text-slate-400 py-4 text-center text-xs border-t border-slate-800">
+        <p>© 2026 Penilaian Harian English Grammar • Passive Voice</p>
+    </footer>
+
+    <script>
+        const questionsData = [
+            // LEVEL A1 (6 Questions: Simple Present Passive)
+            {
+                level: "A1 (Basic)",
+                context: "Active: Farmers grow corn in this fertile valley.",
+                question: "Passive: Corn _____ by farmers in this fertile valley.",
+                options: ["is grown", "are grown", "was grown", "grow", "is grow"],
+                answer: 0
+            },
+            {
+                level: "A1 (Basic)",
+                context: "Active: The teacher helps all the new students every day.",
+                question: "Passive: All the new students _____ by the teacher every day.",
+                options: ["is helped", "are helped", "was helped", "are helping", "helped"],
+                answer: 1
+            },
+            {
+                level: "A1 (Basic)",
+                context: "Active: The security guard locks the main gates at 10 PM.",
+                question: "Passive: The main gates _____ by the security guard at 10 PM.",
+                options: ["is locked", "are locked", "was locked", "were locked", "be locked"],
+                answer: 1
+            },
+            {
+                level: "A1 (Basic)",
+                context: "Active: She cleans the office rooms every morning.",
+                question: "Passive: The office rooms _____ every morning.",
+                options: ["clean", "is cleaned", "are cleaned", "was cleaned", "are cleaning"],
+                answer: 2
+            },
+            {
+                level: "A1 (Basic)",
+                context: "Active: Many people read this online newspaper.",
+                question: "Passive: This online newspaper _____ by many people.",
+                options: ["are read", "is readed", "is read", "was read", "reads"],
+                answer: 2
+            },
+            {
+                level: "A1 (Basic)",
+                context: "Active: Chef Herman prepares delicious soup every afternoon.",
+                question: "Passive: Delicious soup _____ by Chef Herman every afternoon.",
+                options: ["is prepared", "are prepared", "was prepared", "is prepare", "prepares"],
+                answer: 0
+            },
+
+            // LEVEL A2 (6 Questions: Past, Future, Be Going To, By-Phrase)
+            {
+                level: "A2 (Elementary)",
+                context: "Active: Bob mailed the heavy package yesterday afternoon.",
+                question: "Passive: The heavy package _____ by Bob yesterday afternoon.",
+                options: ["is mailed", "was mailed", "were mailed", "will be mailed", "was mail"],
+                answer: 1
+            },
+            {
+                level: "A2 (Elementary)",
+                context: "Active: Mary will write the final report tomorrow.",
+                question: "Passive: The final report _____ by Mary tomorrow.",
+                options: ["will write", "is written", "will be written", "will being written", "would written"],
+                answer: 2
+            },
+            {
+                level: "A2 (Elementary)",
+                context: "Active: A thief stole my leather wallet on the train last night.",
+                question: "Passive: My leather wallet _____ on the train last night.",
+                options: ["was stolen", "is stolen", "stole", "were stolen", "was stole"],
+                answer: 0
+            },
+            {
+                level: "A2 (Elementary)",
+                context: "Active: They are going to build a new library next year.",
+                question: "Passive: A new library _____ next year.",
+                options: ["is going to be built", "is built", "will built", "was going to build", "is going to build"],
+                answer: 0
+            },
+            {
+                level: "A2 (Elementary)",
+                context: "Active: William Shakespeare wrote 'Hamlet' in the early 1600s.",
+                question: "Passive: 'Hamlet' _____ by William Shakespeare in the early 1600s.",
+                options: ["was written", "was wrote", "is written", "wrote", "had wrote"],
+                answer: 0
+            },
+            {
+                level: "A2 (Elementary)",
+                context: "Active: The company delivered the new equipment two days ago.",
+                question: "Passive: The new equipment _____ two days ago.",
+                options: ["delivers", "is delivered", "was delivered", "were delivered", "was deliver"],
+                answer: 2
+            },
+
+            // LEVEL B1 (6 Questions: Continuous, Perfect, Modals, Stative, Two Objects)
+            {
+                level: "B1 (Intermediate)",
+                context: "Active: The mechanics are repairing my car right now.",
+                question: "Passive: My car _____ right now.",
+                options: ["is repaired", "is being repaired", "was repaired", "has been repaired", "is repairing"],
+                answer: 1
+            },
+            {
+                level: "B1 (Intermediate)",
+                context: "Active: The librarian has returned the books to the shelf.",
+                question: "Passive: The books _____ to the shelf.",
+                options: ["has been returned", "have been returned", "were returned", "are returned", "have returned"],
+                answer: 1
+            },
+            {
+                level: "B1 (Intermediate)",
+                context: "Active: You must handle toxic materials with extreme care.",
+                question: "Passive: Toxic materials _____ with extreme care.",
+                options: ["must be handled", "must handled", "must being handled", "are handled", "should handled"],
+                answer: 0
+            },
+            {
+                level: "B1 (Intermediate)",
+                context: "Kalimat dengan dua objek:",
+                question: "Pilihlah bentuk pasif yang PALING ALAMI untuk kalimat: 'The director gave Mrs. Lee a prestigious award.'",
+                options: [
+                    "Mrs. Lee was given a prestigious award.",
+                    "An award was give to Mrs. Lee.",
+                    "Mrs. Lee given a prestigious award.",
+                    "A prestigious award was giving Mrs. Lee.",
+                    "Mrs. Lee was give an award."
+                ],
+                answer: 0
+            },
+            {
+                level: "B1 (Intermediate)",
+                context: "Stative Passive (Kondisi/Keadaan):",
+                question: "Lengkapi preposisi yang tepat: 'Susan is married _____ Alex, and she is deeply interested _____ art.'",
+                options: ["with; in", "to; in", "to; with", "with; at", "by; in"],
+                answer: 1
+            },
+            {
+                level: "B1 (Intermediate)",
+                context: "Active: Workers were painting the museum walls when we arrived.",
+                question: "Passive: The museum walls _____ when we arrived.",
+                options: ["were painted", "were being painted", "had been painted", "are being painted", "was painted"],
+                answer: 1
+            },
+
+            // LEVEL TOEFL / ADVANCED (7 Questions: Inversion, Locative, Causative, Error Analysis)
+            {
+                level: "TOEFL / Advanced",
+                context: "Structure Inversion (Negative/Limiting Word):",
+                question: "Rarely _____ such a complete medical study been published in this journal.",
+                options: ["has", "have", "was", "is", "had been"],
+                answer: 0
+            },
+            {
+                level: "TOEFL / Advanced",
+                context: "Locative Inversion (Keterangan Tempat):",
+                question: "On top of the steep hill _____ an ancient stone temple built in the 10th century.",
+                options: ["located", "was located", "is locating", "was locate", "locates"],
+                answer: 1
+            },
+            {
+                level: "TOEFL / Advanced",
+                context: "Conditional Inversion (Pengandaian tanpa 'If'):",
+                question: "_____ the contract been signed earlier, the financial crisis would have been avoided.",
+                options: ["If", "Had", "Should", "Were", "Have"],
+                answer: 1
+            },
+            {
+                level: "TOEFL / Advanced",
+                context: "Conditional Inversion (Tipe 'Should'):",
+                question: "_____ any security regulations be violated, immediate penalties will apply.",
+                options: ["Had", "Were", "Should", "If", "Unless"],
+                answer: 2
+            },
+            {
+                level: "TOEFL / Advanced",
+                context: "Causative Passive (Have/Get Something Done):",
+                question: "The manager had the official documents _____ by a legal expert before the meeting.",
+                options: ["translate", "translating", "translated", "to translate", "translates"],
+                answer: 2
+            },
+            {
+                level: "TOEFL / Advanced",
+                context: "Impersonal / Reported Passive:",
+                question: "It _____ that the ancient treaty was drafted in 1945.",
+                options: ["is believed", "is believing", "believes", "believed", "is believe"],
+                answer: 0
+            },
+            {
+                level: "TOEFL / Advanced",
+                context: "Analisis Kesalahan (Error Identification):",
+                question: "Manakah kalimat berikut yang SECARA TATA BAHASA (GRAMMAR) BENAR?",
+                options: [
+                    "A catastrophic earthquake was occurred in South Asia yesterday.",
+                    "Rarely have the main causes of the disease been understood by doctors.",
+                    "The final research paper was wrote by the senior team.",
+                    "The suspect is married with the prime witness.",
+                    "An accident was happened on the highway this morning."
+                ],
+                answer: 1
+            }
+        ];
+
+        let studentData = {
+            name: "",
+            kelas: ""
+        };
+        let currentQuestionIndex = 0;
+        let userSelections = new Array(25).fill(null); // Array storing chosen option index (0..4) or null
+
+        function handleStartQuiz(e) {
+            e.preventDefault();
+            const nama = document.getElementById('inputNama').value.trim();
+            const kelas = document.getElementById('inputKelas').value.trim();
+
+            if (!nama || !kelas) {
+                alert("Mohon lengkapi Nama dan Kelas terlebih dahulu.");
+                return;
+            }
+
+            studentData.name = nama;
+            studentData.kelas = kelas;
+
+            // Update top header badge
+            document.getElementById('badgeStudentName').innerText = nama;
+            document.getElementById('badgeStudentClass').innerText = kelas;
+            document.getElementById('topStudentBadge').classList.remove('hidden');
+
+            // Switch screens
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('assessmentScreen').classList.remove('hidden');
+
+            loadQuestion(0);
+        }
+
+        function loadQuestion(index) {
+            currentQuestionIndex = index;
+            const q = questionsData[index];
+
+            // Update Header & Badge
+            document.getElementById('levelBadge').innerText = q.level;
+            document.getElementById('qIndexText').innerText = index + 1;
+            document.getElementById('qContext').innerText = q.context;
+            document.getElementById('qText').innerText = q.question;
+
+            // Progress Bar Width
+            const progressPercent = ((index + 1) / 25) * 100;
+            document.getElementById('progressBar').style.width = `${progressPercent}%`;
+
+            // Answered counter tracker
+            const answeredNum = userSelections.filter(x => x !== null).length;
+            document.getElementById('answeredCountNum').innerText = answeredNum;
+
+            // Render Options (A, B, C, D, E)
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = "";
+
+            const optionLetters = ["A", "B", "C", "D", "E"];
+
+            q.options.forEach((optText, optIdx) => {
+                const isSelected = userSelections[index] === optIdx;
+                
+                const btn = document.createElement('button');
+                btn.type = "button";
+                btn.onclick = () => selectOption(optIdx);
+                
+                btn.className = `w-full text-left p-4 rounded-2xl border-2 font-medium text-sm flex items-center justify-between option-card ${
+                    isSelected ? 'option-selected border-indigo-600 bg-indigo-50/70 text-indigo-950 font-bold' : 'border-slate-200 bg-white text-slate-700 hover:border-indigo-300'
+                }`;
+
+                btn.innerHTML = `
+                    <div class="flex items-center gap-3.5">
+                        <span class="w-8 h-8 rounded-xl flex items-center justify-center font-extrabold text-xs ${
+                            isSelected ? 'bg-indigo-600 text-white shadow-md' : 'bg-slate-100 text-slate-500 border border-slate-200'
+                        }">${optionLetters[optIdx]}</span>
+                        <span class="text-sm md:text-base">${optText}</span>
+                    </div>
+                    <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                        isSelected ? 'border-indigo-600 bg-indigo-600' : 'border-slate-300'
+                    }">
+                        ${isSelected ? '<i class="fa-solid fa-check text-white text-[10px]"></i>' : ''}
+                    </div>
+                `;
+
+                container.appendChild(btn);
+            });
+
+            // Update Navigation Buttons
+            document.getElementById('btnPrev').disabled = (index === 0);
+            const btnNext = document.getElementById('btnNext');
+            
+            if (index === 24) {
+                btnNext.innerHTML = `<span>Kirim Jawaban</span> <i class="fa-solid fa-paper-plane"></i>`;
+                btnNext.className = "px-6 py-2.5 rounded-xl font-bold text-xs md:text-sm bg-emerald-600 hover:bg-emerald-700 text-white shadow-md transition-all flex items-center gap-2";
+                btnNext.onclick = openConfirmModal;
+            } else {
+                btnNext.innerHTML = `<span>Selanjutnya</span> <i class="fa-solid fa-chevron-right"></i>`;
+                btnNext.className = "px-6 py-2.5 rounded-xl font-bold text-xs md:text-sm bg-indigo-600 hover:bg-indigo-700 text-white shadow-md transition-all flex items-center gap-2";
+                btnNext.onclick = navigateNext;
+            }
+        }
+
+        function selectOption(optIdx) {
+            userSelections[currentQuestionIndex] = optIdx;
+            loadQuestion(currentQuestionIndex);
+        }
+
+        function navigateNext() {
+            if (currentQuestionIndex < 24) {
+                loadQuestion(currentQuestionIndex + 1);
+            }
+        }
+
+        function navigatePrev() {
+            if (currentQuestionIndex > 0) {
+                loadQuestion(currentQuestionIndex - 1);
+            }
+        }
+
+        function toggleGridModal() {
+            const modal = document.getElementById('gridModal');
+            if (modal.classList.contains('hidden')) {
+                renderGridItems();
+                modal.classList.remove('hidden');
+            } else {
+                modal.classList.add('hidden');
+            }
+        }
+
+        function renderGridItems() {
+            const container = document.getElementById('gridContainer');
+            container.innerHTML = "";
+
+            for (let i = 0; i < 25; i++) {
+                const isAnswered = userSelections[i] !== null;
+                const isCurrent = currentQuestionIndex === i;
+
+                const btn = document.createElement('button');
+                btn.type = "button";
+                btn.onclick = () => {
+                    loadQuestion(i);
+                    toggleGridModal();
+                };
+
+                let bgClass = "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100";
+                if (isAnswered) {
+                    bgClass = "bg-indigo-600 text-white border-indigo-600 shadow-sm";
+                }
+                if (isCurrent) {
+                    bgClass += " ring-2 ring-indigo-600 ring-offset-2 font-black";
+                }
+
+                btn.className = `py-2.5 rounded-xl font-bold text-xs border transition-all ${bgClass}`;
+                btn.innerText = i + 1;
+
+                container.appendChild(btn);
+            }
+        }
+
+        function openConfirmModal() {
+            const answeredCount = userSelections.filter(x => x !== null).length;
+            const confirmText = document.getElementById('confirmModalText');
+
+            if (answeredCount < 25) {
+                confirmText.innerHTML = `Kamu baru menjawab <strong class="text-indigo-600">${answeredCount} dari 25</strong> soal. Masih ada <strong class="text-rose-600">${25 - answeredCount} soal</strong> yang belum dijawab.`;
+            } else {
+                confirmText.innerHTML = `Semua <strong class="text-emerald-600">25 soal</strong> telah dijawab dengan lengkap! Yakin ingin mengirim sekarang?`;
+            }
+
+            document.getElementById('confirmModal').classList.remove('hidden');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.add('hidden');
+        }
+
+        function submitQuiz() {
+            closeConfirmModal();
+
+            // Calculate Score
+            let correctCount = 0;
+            userSelections.forEach((sel, idx) => {
+                if (sel === questionsData[idx].answer) {
+                    correctCount++;
+                }
+            });
+
+            const incorrectCount = 25 - correctCount;
+            const finalScore = Math.round((correctCount / 25) * 100);
+
+            // Populate Summary
+            document.getElementById('resName').innerText = studentData.name;
+            document.getElementById('resClass').innerText = studentData.kelas;
+            document.getElementById('resScore').innerText = finalScore;
+            document.getElementById('resCorrect').innerText = correctCount;
+            document.getElementById('resIncorrect').innerText = incorrectCount;
+
+            const gradeLabel = document.getElementById('resGradeLabel');
+            if (finalScore >= 85) {
+                gradeLabel.innerText = "Predikat: Sangat Memuaskan (A)";
+            } else if (finalScore >= 70) {
+                gradeLabel.innerText = "Predikat: Baik (B)";
+            } else if (finalScore >= 60) {
+                gradeLabel.innerText = "Predikat: Cukup (C)";
+            } else {
+                gradeLabel.innerText = "Predikat: Perlu Remedial (D)";
+            }
+
+            // Hide Assessment, Show Result
+            document.getElementById('assessmentScreen').classList.add('hidden');
+            document.getElementById('resultScreen').classList.remove('hidden');
+
+            // Trigger Victory Sound & Celebration Effects
+            playVictoryFanfare();
+            triggerConfetti();
+        }
+
+        function playVictoryFanfare() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                const ctx = new AudioContext();
+
+                // Fanfare notes: C5, E5, G5, C6 (Harmonic Arpeggio)
+                const notes = [
+                    { freq: 523.25, time: 0.0, duration: 0.15 },
+                    { freq: 659.25, time: 0.15, duration: 0.15 },
+                    { freq: 783.99, time: 0.30, duration: 0.15 },
+                    { freq: 1046.50, time: 0.45, duration: 0.60 }
+                ];
+
+                notes.forEach(n => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(n.freq, ctx.currentTime + n.time);
+
+                    gain.gain.setValueAtTime(0, ctx.currentTime + n.time);
+                    gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + n.time + 0.03);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + n.time + n.duration);
+
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    osc.start(ctx.currentTime + n.time);
+                    osc.stop(ctx.currentTime + n.time + n.duration);
+                });
+
+                // Secondary Chime effect
+                setTimeout(() => {
+                    [1318.51, 1567.98, 2093.00].forEach((f, i) => {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(f, ctx.currentTime + i * 0.08);
+                        gain.gain.setValueAtTime(0.2, ctx.currentTime + i * 0.08);
+                        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.08 + 0.4);
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.start(ctx.currentTime + i * 0.08);
+                        osc.stop(ctx.currentTime + i * 0.08 + 0.4);
+                    });
+                }, 500);
+            } catch (e) {
+                console.log("Audio synthesis error:", e);
+            }
+        }
+
+        function triggerConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 120,
+                    spread: 80,
+                    origin: { y: 0.6 }
+                });
+
+                setTimeout(() => {
+                    confetti({
+                        particleCount: 80,
+                        angle: 60,
+                        spread: 55,
+                        origin: { x: 0 }
+                    });
+                    confetti({
+                        particleCount: 80,
+                        angle: 120,
+                        spread: 55,
+                        origin: { x: 1 }
+                    });
+                }, 250);
+            }
+        }
+
+        function resetApp() {
+            studentData = { name: "", kelas: "" };
+            currentQuestionIndex = 0;
+            userSelections = new Array(25).fill(null);
+
+            document.getElementById('inputNama').value = "";
+            document.getElementById('inputKelas').value = "";
+
+            document.getElementById('topStudentBadge').classList.add('hidden');
+            document.getElementById('resultScreen').classList.add('hidden');
+            document.getElementById('loginScreen').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
